@@ -1,6 +1,3 @@
-from PMS import *
-from PMS.Objects import *
-from PMS.Shortcuts import *
 
 ###################################################################################################
 
@@ -53,7 +50,7 @@ def MainMenu():
   dir = MediaContainer(noCache=True)
 
   for channel in CHANNELS:
-    if Prefs.Get('_' + channel[0].replace(' ', '').replace('/', '').replace('@', '')):
+    if True:#Prefs.Get('_' + channel[0].replace(' ', '').replace('/', '').replace('@', '')):
       type, width, height = getResolution()
       url = channel[2] % (BASE_URL, type)
       url = SILVERLIGHT_PLAYER % (url, width, height)
@@ -65,6 +62,7 @@ def MainMenu():
 ####################################################################################################
 
 def getResolution():
+
   if Prefs.Get('broadband'):
     return ['bb','534','300']
   else:

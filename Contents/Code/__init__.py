@@ -1,6 +1,3 @@
-
-###################################################################################################
-
 PLUGIN_TITLE               = 'Nederland 24'
 PLUGIN_PREFIX              = '/video/nederland24'
 
@@ -20,7 +17,7 @@ CHANNELS = [
   ["Sterren 24", "sterren24.png", "%s/npo/sterren24-%s", "Op Sterren 24 zijn de beste Nederlandse artiesten te bewonderen en te beluisteren. Naast clips en uitzendingen uit het rijke TROS-archief is er ruimte voor nieuw materiaal en bieden ze aanstormend Nederlands muziektalent een podium op 24-uurs muziekzender Sterren 24."]
 ]
 
-SILVERLIGHT_PLAYER         = 'http://www.plexapp.com/player/silverlight.php?stream=%s&width=%s&height=%s&overstretch=fit'
+SILVERLIGHT_PLAYER         = 'http://www.plexapp.com/player/silverlight.php?stream=%s&width=%d&height=%d&overstretch=fit'
 
 # Default artwork and icon(s)
 PLUGIN_ARTWORK             = 'art-default.png'
@@ -39,31 +36,12 @@ def Start():
 
 ###################################################################################################
 
-def CreatePrefs():
-  Prefs.Add(id='broadband', type='bool', default=True, label=L('BROADBAND'))
-  for i in range( 0, len(CHANNELS) ):
-    Prefs.Add(id='_' + CHANNELS[i][0].replace(' ', '').replace('/', '').replace('@', ''), type='bool', default=True, label=L('SHOW') + ' ' + CHANNELS[i][0])
-
-###################################################################################################
-
 def MainMenu():
   dir = MediaContainer(noCache=True)
 
   for channel in CHANNELS:
-    if True:#Prefs.Get('_' + channel[0].replace(' ', '').replace('/', '').replace('@', '')):
-      type, width, height = getResolution()
-      url = channel[2] % (BASE_URL, type)
-      url = SILVERLIGHT_PLAYER % (url, width, height)
-      dir.Append(WebVideoItem(url, title=channel[0], thumb=R(channel[1]), summary=channel[3]))
+    url = channel[2] % (BASE_URL, 'bb')
+    url = SILVERLIGHT_PLAYER % (url, 534, 300)
+    dir.Append(WebVideoItem(url, title=channel[0], thumb=R(channel[1]), summary=channel[3]))
 
-  dir.Append(PrefsItem(L('PREFERENCES'), thumb=R('icon-prefs.png')))
   return dir
-
-####################################################################################################
-
-def getResolution():
-
-  if Prefs.Get('broadband'):
-    return ['bb','534','300']
-  else:
-    return ['sb','427','240']

@@ -20,7 +20,7 @@ CHANNELS = [
 SILVERLIGHT_PLAYER         = 'http://www.plexapp.com/player/silverlight.php?stream=%s&width=%d&height=%d&overstretch=fit'
 
 # Default artwork and icon(s)
-PLUGIN_ARTWORK             = 'art-default.png'
+PLUGIN_ARTWORK             = 'art-default.jpg'
 PLUGIN_ICON_DEFAULT        = 'icon-default.png'
 
 ###################################################################################################

@@ -39,7 +39,7 @@ def MainMenu():
 
 	for channel in CHANNELS:
 		url = channel[2] % (BASE_URL, 'bb')
-		url = SILVERLIGHT_PLAYER % (url, 534, 300)
+		url = SILVERLIGHT_PLAYER % (url, 640, 360)
 		oc.add(VideoClipObject(key=WebVideoURL(url), rating_key=url, title=channel[0], summary=channel[3], thumb=R(channel[1])))
 
 	return oc

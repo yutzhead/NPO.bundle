@@ -13,7 +13,7 @@ CHANNELS = [
 	["Holland Doc 24", "hollanddoc24.png", "http://livestreams.omroep.nl/npo/hollanddoc24-bb", "Holland Doc 24 brengt op verschillende manieren en niveaus documentaires en reportages onder de aandacht. De programmering op Holland Doc 24 is gecentreerd rond wekelijkse thema's, die gerelateerd zijn aan de actualiteit, de programmering van documentairerubrieken, van culturele instellingen en festivals."],
 	["Humor TV 24", "humortv24.png", "http://livestreams.omroep.nl/npo/humortv24-bb", "Humor TV 24 is een uitgesproken comedykanaal: een frisse, Nederlandse humorzender met hoogwaardige, grappige, scherpe, jonge, nieuwe, satirische, humoristische programma's."],
 	["Journaal 24", "journaal24.png", "http://livestreams.omroep.nl/nos/journaal24-bb", "Via het themakanaal 'Journaal 24' kunnen de live televisieuitzendingen van het NOS Journaal worden gevolgd. De laatste Journaaluitzending wordt herhaald tot de volgende uitzending van het NOS Journaal."],
-	["Politiek 24", "politiek24.png", "http://livestreams.omroep.nl/nos/politiek24-bb", "Politiek 24 is het digitale kanaal over de Nederlandse politiek in de breedste zin van het woord."],
+	["Politiek 24", "politiek24.png", "http://livestreams.omroep.nl/nos/politiek24-bb", "Politiek 24 is het digitale kanaal over de Nederlandse politiek in de breedste zin van het woord."]
 ]
 
 ###################################################################################################

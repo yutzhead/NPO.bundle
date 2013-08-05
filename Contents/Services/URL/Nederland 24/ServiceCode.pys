@@ -1,0 +1,115 @@
+API_URL = 'http://ida.omroep.nl/aapi/?stream=%s'
+STREAM_BASE = 'http://livestreams.omroep.nl/live/npo/%s'
+
+CHANNELS = {
+	'NL1': {
+		'name': 'Nederland 1',
+		'icon': 'https://dl.dropboxusercontent.com/u/2974527/Plex/Nederland-24/ned1.png',
+		'url': 'tvlive/ned1/ned1.isml/ned1.m3u8'
+	},
+	'NL2': {
+		'name': 'Nederland 2',
+		'icon': 'https://dl.dropboxusercontent.com/u/2974527/Plex/Nederland-24/ned2.png',
+		'url': 'tvlive/ned2/ned2.isml/ned2.m3u8'
+	},
+	'NL3': {
+		'name': 'Nederland 3',
+		'icon': 'https://dl.dropboxusercontent.com/u/2974527/Plex/Nederland-24/ned3.png',
+		'url': 'tvlive/ned3/ned3.isml/ned3.m3u8'
+	},
+	'101': {
+		'name': '101 TV',
+		'icon': '',
+		'url': 'thematv/101tv/101tv.isml/101tv.m3u8'
+	},
+	'CUL': {
+		'name': 'Cultura 24',
+		'icon': '',
+		'url': 'thematv/cultura24/cultura24.isml/cultura24.m3u8'
+	},
+	'HIL': {
+		'name': 'Best 24',
+		'icon': '',
+		'url': 'thematv/best24/best24.isml/best24.m3u8'
+	},
+	'HOL': {
+		'name': 'Holland Doc 24',
+		'icon': '',
+		'url': 'thematv/hollanddoc24/hollanddoc24.isml/hollanddoc24.m3u8'
+	},
+	'HTV': {
+		'name': 'Humor TV 24',
+		'icon': '',
+		'url': 'thematv/humor24/humor24.isml/humor24.m3u8'
+	},
+	'N24': {
+		'name': 'Journaal 24',
+		'icon': '',
+		'url': 'thematv/journaal24/journaal24.isml/journaal24.m3u8'
+	},
+	'P24': {
+		'name': 'Politiek 24',
+		'icon': '',
+		'url': 'thematv/politiek24/politiek24.isml/politiek24.m3u8'
+	},
+	'OTV': {
+		'name': 'Zappelin/Zapp',
+		'icon': '',
+		'url': 'thematv/zappelin24/zappelin24.isml/zappelin24.m3u8'
+	}
+}
+
+####################################################################################################
+def MetadataObjectForURL(url):
+
+	slug = url.split('#')[-1]
+	Log(slug)
+
+	if slug not in CHANNELS:
+		raise Ex.MediaNotAvailable
+
+	return VideoClipObject(
+		title = CHANNELS[slug]['name'],
+		thumb = Resource.ContentsOfURLWithFallback(CHANNELS[slug]['icon'], fallback='icon-default.png')
+	)
+
+####################################################################################################
+def MediaObjectsForURL(url):
+
+	return [
+		MediaObject(
+			parts = [
+				PartObject(
+					key = HTTPLiveStreamURL(Callback(PlayVideo, url=url))
+				)
+			],
+			video_resolution = '480',
+			audio_channels = 2,
+			optimized_for_streaming = True
+		)
+	]
+
+####################################################################################################
+@indirect
+def PlayVideo(url):
+
+	slug = url.split('#')[-1]
+
+	if slug not in CHANNELS:
+		raise Ex.MediaNotAvailable
+
+	stream_url = STREAM_BASE % CHANNELS[slug]['url']
+	json_obj = JSON.ObjectFromURL(API_URL % stream_url)
+
+	if json_obj['success'] == True:
+		stream = json_obj['stream']
+
+		try:
+			req = HTTP.Request(stream, cacheTime=0, follow_redirects=False).content
+		except Ex.RedirectError, e:
+			if 'Location' in e.headers:
+				stream = e.headers['Location']
+
+		return IndirectResponse(VideoClipObject, key=HTTPLiveStreamURL(stream))
+	else:
+		raise Ex.MediaNotAvailable

@@ -56,6 +56,11 @@ CHANNELS = [
 		'name': 'Zappelin/Zapp',
 		'icon': '',
 		'slug': 'OTV'
+	},
+	{
+		'name': '3FM',
+		'icon': 'https://dl.dropboxusercontent.com/u/2974527/Plex/Nederland-24/3fm.png',
+		'slug': '3FM'
 	}
 ]
 

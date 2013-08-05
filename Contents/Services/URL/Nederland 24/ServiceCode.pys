@@ -56,6 +56,11 @@ CHANNELS = {
 		'name': 'Zappelin/Zapp',
 		'icon': '',
 		'url': 'thematv/zappelin24/zappelin24.isml/zappelin24.m3u8'
+	},
+	'3FM': {
+		'name': '3FM',
+		'icon': 'https://dl.dropboxusercontent.com/u/2974527/Plex/Nederland-24/3fm.png',
+		'url': 'visualradio/3fm/3fm.isml/3fm.m3u8'
 	}
 }
 

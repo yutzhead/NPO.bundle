@@ -63,7 +63,6 @@ CHANNELS = {
 def MetadataObjectForURL(url):
 
 	slug = url.split('#')[-1]
-	Log(slug)
 
 	if slug not in CHANNELS:
 		raise Ex.MediaNotAvailable

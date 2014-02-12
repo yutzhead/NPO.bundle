@@ -1,5 +1,5 @@
 NAME = 'Nederland 24'
-BASE_URL = 'http://nederland24.nl/'
+BASE_URL = 'http://www.npo.nl/live'
 
 CHANNELS = [
 	{
@@ -79,7 +79,7 @@ def MainMenu():
 		oc.add(VideoClipObject(
 			url = '%s#%s' % (BASE_URL, channel['slug']),
 			title = channel['name'],
-			thumb = Resource.ContentsOfURLWithFallback(channel['icon'], fallback='icon-default.png')
+			thumb = Resource.ContentsOfURLWithFallback(channel['icon'])
 		))
 
 	return oc

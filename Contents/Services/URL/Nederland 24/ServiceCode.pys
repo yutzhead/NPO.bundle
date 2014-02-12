@@ -74,7 +74,7 @@ def MetadataObjectForURL(url):
 
 	return VideoClipObject(
 		title = CHANNELS[slug]['name'],
-		thumb = Resource.ContentsOfURLWithFallback(CHANNELS[slug]['icon'], fallback='icon-default.png')
+		thumb = Resource.ContentsOfURLWithFallback(CHANNELS[slug]['icon'])
 	)
 
 ####################################################################################################
@@ -103,7 +103,7 @@ def PlayVideo(url):
 		raise Ex.MediaNotAvailable
 
 	stream_url = STREAM_BASE % CHANNELS[slug]['url']
-	json_obj = JSON.ObjectFromURL(API_URL % stream_url)
+	json_obj = JSON.ObjectFromURL(API_URL % stream_url, cacheTime=0)
 
 	if json_obj['success'] == True:
 		stream = json_obj['stream']

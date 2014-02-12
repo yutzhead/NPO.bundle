@@ -8,7 +8,7 @@
 		<dict>
 			<key>URLPatterns</key>
 			<array>
-				<string>^http://nederland24\.nl/#\w{3}</string>
+				<string>^http://www\.npo\.nl/live#\w{3}</string>
 			</array>
 		</dict>
 	</dict>

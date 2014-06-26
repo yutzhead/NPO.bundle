@@ -103,7 +103,7 @@ def PlayVideo(url):
 		raise Ex.MediaNotAvailable
 
 	stream_url = STREAM_BASE % CHANNELS[slug]['url']
-	json_obj = JSON.ObjectFromURL(API_URL % stream_url, cacheTime=0)
+	json_obj = JSON.ObjectFromURL(API_URL % stream_url, cacheTime=0, headers={'Referer': 'http://www.npo.nl/live'})
 
 	if json_obj['success'] == True:
 		stream = json_obj['stream']

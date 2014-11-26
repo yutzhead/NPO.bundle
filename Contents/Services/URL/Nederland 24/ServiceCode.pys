@@ -1,73 +1,70 @@
-API_URL = 'http://ida.omroep.nl/aapi/?stream=%s'
+API_URL = 'http://ida.omroep.nl/aapi/?stream=%s&token=%s'
+TOKEN_URL = 'http://ida.omroep.nl/npoplayer/i.js'
+RE_TOKEN = Regex('\.token = "([^"]+)";')
 STREAM_BASE = 'http://livestreams.omroep.nl/live/npo/%s'
 
 CHANNELS = {
-	'NL1': {
-		'name': 'Nederland 1',
+	'npo-1': {
+		'name': 'NPO 1',
 		'icon': 'https://dl.dropboxusercontent.com/u/2974527/Plex/Nederland-24/ned1.png',
 		'url': 'tvlive/ned1/ned1.isml/ned1.m3u8'
 	},
-	'NL2': {
-		'name': 'Nederland 2',
+	'npo-2': {
+		'name': 'NPO 2',
 		'icon': 'https://dl.dropboxusercontent.com/u/2974527/Plex/Nederland-24/ned2.png',
 		'url': 'tvlive/ned2/ned2.isml/ned2.m3u8'
 	},
-	'NL3': {
-		'name': 'Nederland 3',
+	'npo-3': {
+		'name': 'NPO 3',
 		'icon': 'https://dl.dropboxusercontent.com/u/2974527/Plex/Nederland-24/ned3.png',
 		'url': 'tvlive/ned3/ned3.isml/ned3.m3u8'
 	},
-	'101': {
-		'name': '101 TV',
-		'icon': '',
-		'url': 'thematv/101tv/101tv.isml/101tv.m3u8'
-	},
-	'CUL': {
-		'name': 'Cultura 24',
-		'icon': '',
-		'url': 'thematv/cultura24/cultura24.isml/cultura24.m3u8'
-	},
-	'HIL': {
-		'name': 'Best 24',
-		'icon': '',
-		'url': 'thematv/best24/best24.isml/best24.m3u8'
-	},
-	'HOL': {
-		'name': 'Holland Doc 24',
-		'icon': '',
-		'url': 'thematv/hollanddoc24/hollanddoc24.isml/hollanddoc24.m3u8'
-	},
-	'HTV': {
-		'name': 'Humor TV 24',
-		'icon': '',
-		'url': 'thematv/humor24/humor24.isml/humor24.m3u8'
-	},
-	'N24': {
-		'name': 'Journaal 24',
+	'npo-nieuws': {
+		'name': 'NPO Nieuws',
 		'icon': '',
 		'url': 'thematv/journaal24/journaal24.isml/journaal24.m3u8'
 	},
-	'P24': {
-		'name': 'Politiek 24',
+	'npo-cultura': {
+		'name': 'NPO Cultura',
+		'icon': '',
+		'url': 'thematv/cultura24/cultura24.isml/cultura24.m3u8'
+	},
+	'npo-101': {
+		'name': 'NPO 101',
+		'icon': '',
+		'url': 'thematv/101tv/101tv.isml/101tv.m3u8'
+	},
+	'npo-politiek': {
+		'name': 'NPO Politiek',
 		'icon': '',
 		'url': 'thematv/politiek24/politiek24.isml/politiek24.m3u8'
 	},
-	'OTV': {
-		'name': 'Zappelin/Zapp',
+	'npo-best': {
+		'name': 'NPO Best',
+		'icon': '',
+		'url': 'thematv/best24/best24.isml/best24.m3u8'
+	},
+	'npo-doc': {
+		'name': 'NPO Doc',
+		'icon': '',
+		'url': 'thematv/hollanddoc24/hollanddoc24.isml/hollanddoc24.m3u8'
+	},
+	'npo-zappxtra': {
+		'name': 'NPO Zapp Xtra',
 		'icon': '',
 		'url': 'thematv/zappelin24/zappelin24.isml/zappelin24.m3u8'
 	},
-	'3FM': {
-		'name': '3FM',
-		'icon': 'https://dl.dropboxusercontent.com/u/2974527/Plex/Nederland-24/3fm.png',
-		'url': 'visualradio/3fm/3fm.isml/3fm.m3u8'
+	'npo-humor-tv': {
+		'name': 'NPO Humor TV',
+		'icon': '',
+		'url': 'thematv/humor24/humor24.isml/humor24.m3u8'
 	}
 }
 
 ####################################################################################################
 def MetadataObjectForURL(url):
 
-	slug = url.split('#')[-1]
+	slug = url.split('/')[-1]
 
 	if slug not in CHANNELS:
 		raise Ex.MediaNotAvailable
@@ -97,13 +94,17 @@ def MediaObjectsForURL(url):
 @indirect
 def PlayVideo(url):
 
-	slug = url.split('#')[-1]
+	slug = url.split('/')[-1]
 
 	if slug not in CHANNELS:
 		raise Ex.MediaNotAvailable
 
 	stream_url = STREAM_BASE % CHANNELS[slug]['url']
-	json_obj = JSON.ObjectFromURL(API_URL % stream_url, cacheTime=0, headers={'Referer': 'http://www.npo.nl/live'})
+
+	token_data = HTTP.Request(TOKEN_URL, cacheTime=0).content
+	token = RE_TOKEN.search(token_data).group(1)
+
+	json_obj = JSON.ObjectFromURL(API_URL % (stream_url, token), cacheTime=0)
 
 	if json_obj['success'] == True:
 		stream = json_obj['stream']

@@ -3,64 +3,59 @@ BASE_URL = 'http://www.npo.nl/live'
 
 CHANNELS = [
 	{
-		'name': 'Nederland 1',
+		'name': 'NPO 1',
 		'icon': 'https://dl.dropboxusercontent.com/u/2974527/Plex/Nederland-24/ned1.png',
-		'slug': 'NL1'
+		'slug': 'npo-1'
 	},
 	{
-		'name': 'Nederland 2',
+		'name': 'NPO 2',
 		'icon': 'https://dl.dropboxusercontent.com/u/2974527/Plex/Nederland-24/ned2.png',
-		'slug': 'NL2'
+		'slug': 'npo-2'
 	},
 	{
-		'name': 'Nederland 3',
+		'name': 'NPO 3',
 		'icon': 'https://dl.dropboxusercontent.com/u/2974527/Plex/Nederland-24/ned3.png',
-		'slug': 'NL3'
+		'slug': 'npo-3'
 	},
 	{
-		'name': '101 TV',
+		'name': 'NPO Nieuws',
 		'icon': '',
-		'slug': '101'
+		'slug': 'npo-nieuws'
 	},
 	{
-		'name': 'Cultura 24',
+		'name': 'NPO Cultura',
 		'icon': '',
-		'slug': 'CUL'
+		'slug': 'npo-cultura'
 	},
 	{
-		'name': 'Best 24',
+		'name': 'NPO 101',
 		'icon': '',
-		'slug': 'HIL'
+		'slug': 'npo-101'
 	},
 	{
-		'name': 'Holland Doc 24',
+		'name': 'NPO Politiek',
 		'icon': '',
-		'slug': 'HOL'
+		'slug': 'npo-politiek'
 	},
 	{
-		'name': 'Humor TV 24',
+		'name': 'NPO Best',
 		'icon': '',
-		'slug': 'HTV'
+		'slug': 'npo-best'
 	},
 	{
-		'name': 'Journaal 24',
+		'name': 'NPO Doc',
 		'icon': '',
-		'slug': 'N24'
+		'slug': 'npo-doc'
 	},
 	{
-		'name': 'Politiek 24',
+		'name': 'NPO Zapp Xtra',
 		'icon': '',
-		'slug': 'P24'
+		'slug': 'npo-zappxtra'
 	},
 	{
-		'name': 'Zappelin/Zapp',
+		'name': 'NPO Humor TV',
 		'icon': '',
-		'slug': 'OTV'
-	},
-	{
-		'name': '3FM',
-		'icon': 'https://dl.dropboxusercontent.com/u/2974527/Plex/Nederland-24/3fm.png',
-		'slug': '3FM'
+		'slug': 'npo-humor-tv'
 	}
 ]
 
@@ -77,7 +72,7 @@ def MainMenu():
 
 	for channel in CHANNELS:
 		oc.add(VideoClipObject(
-			url = '%s#%s' % (BASE_URL, channel['slug']),
+			url = '%s/%s' % (BASE_URL, channel['slug']),
 			title = channel['name'],
 			thumb = Resource.ContentsOfURLWithFallback(channel['icon'])
 		))

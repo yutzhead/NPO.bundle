@@ -4,50 +4,17 @@ RE_TOKEN = Regex('\.token = "([^"]+)";')
 STREAM_BASE = 'http://livestreams.omroep.nl/live/npo/%s'
 
 CHANNELS = {
-	'npo-1': {
-		'name': 'NPO 1',
-		'url': 'tvlive/ned1/ned1.isml/ned1.m3u8'
-	},
-	'npo-2': {
-		'name': 'NPO 2',
-		'url': 'tvlive/ned2/ned2.isml/ned2.m3u8'
-	},
-	'npo-3': {
-		'name': 'NPO Zapp',
-		'url': 'tvlive/ned3/ned3.isml/ned3.m3u8'
-	},
-	'npo-nieuws': {
-		'name': 'NPO Nieuws',
-		'url': 'thematv/journaal24/journaal24.isml/journaal24.m3u8'
-	},
-	'npo-cultura': {
-		'name': 'NPO Cultura',
-		'url': 'thematv/cultura24/cultura24.isml/cultura24.m3u8'
-	},
-	'npo-101': {
-		'name': 'NPO 101',
-		'url': 'thematv/101tv/101tv.isml/101tv.m3u8'
-	},
-	'npo-politiek': {
-		'name': 'NPO Politiek',
-		'url': 'thematv/politiek24/politiek24.isml/politiek24.m3u8'
-	},
-	'npo-best': {
-		'name': 'NPO Best',
-		'url': 'thematv/best24/best24.isml/best24.m3u8'
-	},
-	'npo-doc': {
-		'name': 'NPO Doc',
-		'url': 'thematv/hollanddoc24/hollanddoc24.isml/hollanddoc24.m3u8'
-	},
-	'npo-zappxtra': {
-		'name': 'NPO Zapp Xtra',
-		'url': 'thematv/zappelin24/zappelin24.isml/zappelin24.m3u8'
-	},
-	'npo-humor-tv': {
-		'name': 'NPO Humor TV',
-		'url': 'thematv/humor24/humor24.isml/humor24.m3u8'
-	}
+	'npo-1':  'tvlive/ned1/ned1.isml/ned1.m3u8',
+	'npo-2': 'tvlive/ned2/ned2.isml/ned2.m3u8',
+	'npo-3': 'tvlive/ned3/ned3.isml/ned3.m3u8',
+	'npo-nieuws': 'thematv/journaal24/journaal24.isml/journaal24.m3u8',
+	'npo-cultura': 'thematv/cultura24/cultura24.isml/cultura24.m3u8',
+	'npo-101': 'thematv/101tv/101tv.isml/101tv.m3u8',
+	'npo-politiek': 'thematv/politiek24/politiek24.isml/politiek24.m3u8',
+	'npo-best': 'thematv/best24/best24.isml/best24.m3u8',
+	'npo-doc': 'thematv/hollanddoc24/hollanddoc24.isml/hollanddoc24.m3u8',
+	'npo-zappxtra': 'thematv/zappelin24/zappelin24.isml/zappelin24.m3u8',
+	'npo-humor-tv': 'thematv/humor24/humor24.isml/humor24.m3u8'
 }
 
 ####################################################################################################
@@ -74,7 +41,8 @@ def MetadataObjectForURL(url):
 		duration = (int(duration[0])*60000) + (int(duration[1])*1000)
 	except: duration = 0
 	
-	try:  genres = html.xpath('//div[span/@class="npo-glyph box"]/p//text()')[0].replace(', ', ' en ').split(' en ')
+	try: 
+		genres = html.xpath('//div[span/@class="npo-glyph box"]/p//text()')[0].replace(', ', ' en ').split(' en ')
 	except: genres = []
 	
 	try: studio = html.xpath('//div[span/@class="npo-glyph broadcast"]/p//text()')[0]
@@ -122,7 +90,7 @@ def PlayVideo(url):
 	if slug not in CHANNELS:
 		raise Ex.MediaNotAvailable
 
-	stream_url = STREAM_BASE % CHANNELS[slug]['url']
+	stream_url = STREAM_BASE % CHANNELS[slug]
 
 	token_data = HTTP.Request(TOKEN_URL, cacheTime=0).content
 	token = RE_TOKEN.search(token_data).group(1)

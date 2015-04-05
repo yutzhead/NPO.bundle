@@ -17,11 +17,7 @@ CHANNELS = [
 
 ####################################################################################################
 def Start():
-  Plugin.AddViewGroup("InfoList", viewMode="InfoList", mediaType="items")
-  Plugin.AddViewGroup("List", viewMode="List", mediaType="items")
-
   ObjectContainer.title1 = NAME
-  ObjectContainer.view_group = 'List'
 
 ####################################################################################################
 @handler('/video/npo', NAME)

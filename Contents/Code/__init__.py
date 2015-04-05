@@ -17,18 +17,20 @@ CHANNELS = [
 
 ####################################################################################################
 def Start():
-  ObjectContainer.title1 = NAME
+
+	ObjectContainer.title1 = NAME
 
 ####################################################################################################
 @handler('/video/npo', NAME)
 def MainMenu():
-  oc = ObjectContainer()
 
-  for channel in CHANNELS:
-    url = '%s/%s' % (BASE_URL, channel)
-    voc = URLService.MetadataObjectForURL(url)
-    voc.url = url
-    voc.title = voc.source_title+': '+voc.title
-    oc.add(voc)
+	oc = ObjectContainer()
 
-  return oc
+	for channel in CHANNELS:
+		url = '%s/%s' % (BASE_URL, channel)
+		voc = URLService.MetadataObjectForURL(url)
+		voc.url = url
+		voc.title = voc.source_title+': '+voc.title
+		oc.add(voc)
+
+	return oc

@@ -13,7 +13,7 @@ CHANNELS = {
 		'url': 'tvlive/ned2/ned2.isml/ned2.m3u8'
 	},
 	'npo-3': {
-		'name': 'NPO 3',
+		'name': 'NPO Zapp',
 		'url': 'tvlive/ned3/ned3.isml/ned3.m3u8'
 	},
 	'npo-nieuws': {
@@ -60,7 +60,26 @@ def MetadataObjectForURL(url):
 
 	html = HTML.ElementFromURL(url)
 
-	title = html.xpath('//h1[contains(text(), "Nu ")]/span//text()')[0]
+	title = html.xpath('//h1[contains(text(), "Nu ")]/span//text()')[0].strip()
+	
+	channel = html.xpath('//title//text()')[0].split(' -')[0].strip()
+	
+	try: summary = html.xpath('//span[@class="omission-overflow hide"]//text()')[0].strip()
+	except:
+		try: summary=html.xpath('//p[@class="overflow-description"]//text()')[0].strip()
+		except: summary = ""
+		 
+	try: 
+		duration = html.xpath('//div[span/@class="npo-glyph clock"]/p//text()')[0].split(':')
+		duration = (int(duration[0])*60000) + (int(duration[1])*1000)
+	except: duration = 0
+	
+	try: 
+		genres = html.xpath('//div[span/@class="npo-glyph box"]/p//text()')[0].replace(', ', ' en ').split(' en ')
+	except: genres = []
+	
+	try: studio = html.xpath('//div[span/@class="npo-glyph broadcast"]/p//text()')[0]
+	except: studio = ''
 
 	thumb = html.xpath('//div[@class="channel-logo"]/@style')[0].split("background-image: url('")[-1].split("')")[0].split('//')[-1].replace('regular_', '')
 	thumb = 'http://%s' % (thumb)
@@ -68,8 +87,13 @@ def MetadataObjectForURL(url):
 	art = html.xpath('//div[@class="showcase-background"]/@style')[0].split("background-image: url('")[-1].split("')")[0].split('//')[-1]
 	art = 'http://%s' % (art)
 
-	return VideoClipObject(
+	return EpisodeObject(
 		title = title,
+		summary = summary,
+		duration = duration,
+		#genres = genres,
+		directors = [studio],
+		source_title = channel,
 		thumb = Resource.ContentsOfURLWithFallback(thumb),
 		art = art
 	)

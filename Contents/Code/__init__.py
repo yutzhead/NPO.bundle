@@ -1,62 +1,18 @@
-NAME = 'Nederland 24'
+NAME = 'NPO'
 BASE_URL = 'http://www.npo.nl/live'
 
 CHANNELS = [
-	{
-		'name': 'NPO 1',
-		'icon': 'https://dl.dropboxusercontent.com/u/2974527/Plex/Nederland-24/ned1.png',
-		'slug': 'npo-1'
-	},
-	{
-		'name': 'NPO 2',
-		'icon': 'https://dl.dropboxusercontent.com/u/2974527/Plex/Nederland-24/ned2.png',
-		'slug': 'npo-2'
-	},
-	{
-		'name': 'NPO 3',
-		'icon': 'https://dl.dropboxusercontent.com/u/2974527/Plex/Nederland-24/ned3.png',
-		'slug': 'npo-3'
-	},
-	{
-		'name': 'NPO Nieuws',
-		'icon': '',
-		'slug': 'npo-nieuws'
-	},
-	{
-		'name': 'NPO Cultura',
-		'icon': '',
-		'slug': 'npo-cultura'
-	},
-	{
-		'name': 'NPO 101',
-		'icon': '',
-		'slug': 'npo-101'
-	},
-	{
-		'name': 'NPO Politiek',
-		'icon': '',
-		'slug': 'npo-politiek'
-	},
-	{
-		'name': 'NPO Best',
-		'icon': '',
-		'slug': 'npo-best'
-	},
-	{
-		'name': 'NPO Doc',
-		'icon': '',
-		'slug': 'npo-doc'
-	},
-	{
-		'name': 'NPO Zapp Xtra',
-		'icon': '',
-		'slug': 'npo-zappxtra'
-	},
-	{
-		'name': 'NPO Humor TV',
-		'icon': '',
-		'slug': 'npo-humor-tv'
-	}
+	'npo-1',
+	'npo-2',
+	'npo-3',
+	'npo-nieuws',
+	'npo-cultura',
+	'npo-101',
+	'npo-politiek',
+	'npo-best',
+	'npo-doc',
+	'npo-zappxtra',
+	'npo-humor-tv'
 ]
 
 ####################################################################################################
@@ -65,16 +21,16 @@ def Start():
 	ObjectContainer.title1 = NAME
 
 ####################################################################################################
-@handler('/video/nederland24', NAME)
+@handler('/video/npo', NAME)
 def MainMenu():
 
 	oc = ObjectContainer()
 
 	for channel in CHANNELS:
-		oc.add(VideoClipObject(
-			url = '%s/%s' % (BASE_URL, channel['slug']),
-			title = channel['name'],
-			thumb = Resource.ContentsOfURLWithFallback(channel['icon'])
-		))
+		url = '%s/%s' % (BASE_URL, channel)
+		voc = URLService.MetadataObjectForURL(url)
+		voc.url = url
+		voc.title = voc.source_title+': '+voc.title
+		oc.add(voc)
 
 	return oc

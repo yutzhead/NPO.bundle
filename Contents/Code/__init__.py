@@ -27,10 +27,13 @@ def MainMenu():
 	oc = ObjectContainer()
 
 	for channel in CHANNELS:
-		url = '%s/%s' % (BASE_URL, channel)
-		voc = URLService.MetadataObjectForURL(url)
-		voc.url = url
-		voc.title = voc.source_title+': '+voc.title
-		oc.add(voc)
+		try:
+			url = '%s/%s' % (BASE_URL, channel)
+			voc = URLService.MetadataObjectForURL(url)
+			voc.url = url
+			voc.title = voc.source_title+': '+voc.title
+			oc.add(voc)
+		except:
+			continue
 
 	return oc

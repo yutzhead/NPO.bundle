@@ -1,5 +1,5 @@
 API_URL = 'http://ida.omroep.nl/aapi/?stream=%s&token=%s'
-TOKEN_URL = 'http://ida.omroep.nl/npoplayer/i.js'
+TOKEN_URL = 'http://ida.omroep.nl/npoplayer/i.js?s=%s'
 RE_TOKEN = Regex('\.token = "([^"]+)";')
 STREAM_BASE = 'http://livestreams.omroep.nl/live/npo/%s'
 
@@ -17,6 +17,11 @@ CHANNELS = {
 	'npo-humor-tv': 'thematv/humor24/humor24.isml/humor24.m3u8'
 }
 
+HTTP_HEADERS = {
+	'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.130 Safari/537.36',
+	'Referer': 'http://www.npo.nl/'
+}
+
 ####################################################################################################
 def MetadataObjectForURL(url):
 
@@ -25,7 +30,7 @@ def MetadataObjectForURL(url):
 	if slug not in CHANNELS:
 		raise Ex.MediaNotAvailable
 
-	html = HTML.ElementFromURL(url)
+	html = HTML.ElementFromURL(url, cacheTime=0, headers=HTTP_HEADERS)
 
 	title = html.xpath('//h1[contains(text(), "Nu ")]/span//text()')[0].strip()
 
@@ -99,20 +104,24 @@ def PlayVideo(url):
 
 	stream_url = STREAM_BASE % CHANNELS[slug]
 
-	token_data = HTTP.Request(TOKEN_URL, cacheTime=0).content
-	token = RE_TOKEN.search(token_data).group(1)
+	for x in range(0, 50):
 
-	json_obj = JSON.ObjectFromURL(API_URL % (stream_url, token), cacheTime=0)
+		token_data = HTTP.Request(TOKEN_URL % (String.Quote(url)), cacheTime=0, headers=HTTP_HEADERS).content
+		token = RE_TOKEN.search(token_data).group(1)
 
-	if json_obj['success'] == True:
-		stream = json_obj['stream']
+		json_obj = JSON.ObjectFromURL(API_URL % (stream_url, token), headers=HTTP_HEADERS, cacheTime=0)
 
-		try:
-			req = HTTP.Request(stream, cacheTime=0, follow_redirects=False).content
-		except Ex.RedirectError, e:
-			if 'Location' in e.headers:
-				stream = e.headers['Location']
+		if json_obj['success'] == True:
+			stream = json_obj['stream']
 
-		return IndirectResponse(VideoClipObject, key=HTTPLiveStreamURL(stream))
-	else:
-		raise Ex.MediaNotAvailable
+			try:
+				req = HTTP.Request(stream, cacheTime=0, follow_redirects=False, headers=HTTP_HEADERS).content
+			except Ex.RedirectError, e:
+				if 'Location' in e.headers:
+					stream = e.headers['Location']
+
+			return IndirectResponse(VideoClipObject, key=HTTPLiveStreamURL(stream))
+		else:
+			continue
+
+	raise Ex.MediaNotAvailable

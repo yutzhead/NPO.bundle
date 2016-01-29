@@ -1,0 +1,157 @@
+API_URL = 'http://ida.omroep.nl/aapi/?stream=%s&token=%s'
+TOKEN_URL = 'http://ida.omroep.nl/npoplayer/i.js?s=%s'
+RE_TOKEN = Regex('\.token = "([^"]+)";')
+STREAM_BASE = 'http://livestreams.omroep.nl/live/npo/%s'
+
+CHANNELS = {
+	'npo-1':  'tvlive/ned1/ned1.isml/ned1.m3u8',
+	'npo-2': 'tvlive/ned2/ned2.isml/ned2.m3u8',
+	'npo-3': 'tvlive/ned3/ned3.isml/ned3.m3u8',
+	'zapp': 'tvlive/ned3/ned3.isml/ned3.m3u8',
+	'npo-nieuws': 'thematv/journaal24/journaal24.isml/journaal24.m3u8',
+	'npo-cultura': 'thematv/cultura24/cultura24.isml/cultura24.m3u8',
+	'npo-101': 'thematv/101tv/101tv.isml/101tv.m3u8',
+	'npo-politiek': 'thematv/politiek24/politiek24.isml/politiek24.m3u8',
+	'npo-best': 'thematv/best24/best24.isml/best24.m3u8',
+	'npo-doc': 'thematv/hollanddoc24/hollanddoc24.isml/hollanddoc24.m3u8',
+	'npo-zappxtra': 'thematv/zappelin24/zappelin24.isml/zappelin24.m3u8',
+	'npo-humor-tv': 'thematv/humor24/humor24.isml/humor24.m3u8'
+}
+
+HEADERS = {
+	'User-Agent': 'Mozilla/5.0 (iPad; CPU OS 6_0_1 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A523 Safari/8536.25',
+	'Cookie': 'npo_cc=30'
+}
+
+import dateutil
+import datetime
+
+####################################################################################################
+def MetadataObjectForURL(url):
+
+	slug = url.split('/')[-1]
+
+	if slug not in CHANNELS:
+		raise Ex.MediaNotAvailable
+
+	html = HTML.ElementFromURL(url, cacheTime=60*5)
+
+	if slug == 'zapp':
+		html_gids = HTML.ElementFromURL(url.replace(slug, 'npo-1'), cacheTime=60)
+		slug = 'npo-3'
+
+		gids_xpath = "//div[contains(concat(' ',normalize-space(@class),' '),'schedule-item')"
+		gids_xpath += " and contains(concat(' ',normalize-space(@class),' '),'"+slug+" ')"
+		if slug in ['npo-1', 'npo-2','npo-3']:
+			gids_xpath += " and contains(concat(' ',normalize-space(@class),' '),'primary')"
+		gids_xpath += "]"
+		gids = html_gids.xpath(gids_xpath)[0]
+
+		channel = gids.xpath('.//img/@alt')[0].replace('Logo van ', '')
+		thumb = gids.xpath('.//img/@src')[0].replace('regular_', '')
+		thumb = 'http:%s' % (thumb)
+	else:
+		channel = html.xpath('//title//text()')[0].split(' -')[0].strip()
+		thumb = html.xpath('//div[@class="channel-logo"]/@style')[0].split("background-image: url('")[-1].split("')")[0].split('//')[-1].replace('regular_', '')
+		thumb = 'http://%s' % (thumb)
+
+	title = html.xpath('//h1[contains(text(), "Nu ")]/span//text()')[0].strip()
+
+	try: summary = html.xpath('//span[@class="omission-overflow hide"]//text()')[0].strip()
+	except:
+		try: summary=html.xpath('//p[@class="overflow-description"]//text()')[0].strip()
+		except: summary = ""
+
+	try:
+		duration = html.xpath('//div[span/@class="npo-glyph clock"]/p//text()')[0].split(':')
+		duration = (int(duration[0])*60000) + (int(duration[1])*1000)
+	except: duration = 0
+
+	try:
+		genres = html.xpath('//div[span/@class="npo-glyph box"]/p//text()')[0].replace(', ', ' en ').split(' en ')
+	except: genres = []
+
+	try: studio = html.xpath('//div[span/@class="npo-glyph broadcast"]/p//text()')[0]
+	except: studio = ''
+
+	if channel == 'NPO 3':
+		art = 'http://assets.www.npo.nl/uploads/tv_channel/265/background/regular_achtergr-npo3-2.jpg'
+	else:
+		art = html.xpath('//div[@class="showcase-background"]/@style')[0].split("background-image: url('")[-1].split("')")[0].split('//')[-1]
+		art = 'http://%s' % (art)
+
+	return EpisodeObject(
+		title = title,
+		summary = summary,
+		duration = duration,
+		#genres = genres,
+		directors = [studio],
+		source_title = channel,
+		thumb = Resource.ContentsOfURLWithFallback(thumb),
+		art = art
+	)
+
+####################################################################################################
+@deferred
+def MediaObjectsForURL(url):
+
+	return [
+		MediaObject(
+			parts = [
+				PartObject(
+					key = HTTPLiveStreamURL(Callback(PlayVideo, url=url))
+				)
+			],
+			video_resolution = '480',
+			audio_channels = 2,
+			optimized_for_streaming = True
+		)
+	]
+
+####################################################################################################
+@indirect
+def PlayVideo(url):
+
+	slug = url.split('/')[-1]
+
+	if slug not in CHANNELS:
+		raise Ex.MediaNotAvailable
+
+	stream_url = STREAM_BASE % CHANNELS[slug]
+
+	token_data = HTTP.Request(TOKEN_URL % stream_url, headers=HEADERS, cacheTime=0).content
+	token = RE_TOKEN.search(token_data)
+
+	if not token:
+		return
+
+	token_l = list(token.group(1))
+	first = second = None
+	for i in range(5, len(token_l) - 4):
+		if token_l[i].isdigit():
+			if first is None:
+				first = i
+			elif second is None:
+				second = i
+	if first is None or second is None:
+		first = 12
+		second = 13
+
+	token_l[first], token_l[second] = token_l[second], token_l[first]
+
+	token = ''.join(token_l)
+
+	json_obj = JSON.ObjectFromURL(API_URL % (stream_url, token), cacheTime=0)
+
+	if json_obj['success'] == True:
+		stream = json_obj['stream']
+
+		try:
+			req = HTTP.Request(stream, cacheTime=0, follow_redirects=False).content
+		except Ex.RedirectError, e:
+			if 'Location' in e.headers:
+				stream = e.headers['Location']
+
+		return IndirectResponse(VideoClipObject, key=HTTPLiveStreamURL(stream))
+	else:
+		raise Ex.MediaNotAvailable

@@ -4,13 +4,20 @@
 <dict>
 	<key>URL</key>
 	<dict>
-		<key>NPO</key>
+		<key>NPOLive</key>
 		<dict>
 			<key>URLPatterns</key>
 			<array>
 				<string>^http:\/\/www\.npo\.nl\/live\/.+</string>
 			</array>
 		</dict>
+		<key>NPO_Fix</key>
+    	<dict>
+        <key>URLPatterns</key>
+        <array>
+        	<string>^http:\/\/(www\.)?npo\.nl\/[^/]+\/[0-9]{2}\-[0-9]{2}\-[0-9]{4}\/.+\d+</string>
+        </array>
+      </dict>
 	</dict>
 </dict>
 </plist>
